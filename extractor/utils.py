@@ -3,15 +3,17 @@ import random
 import requests
 import json
 import re
-from collections import defaultdict
-import pandas as pd
 from tqdm import tqdm
 from pytube import YouTube
-import streamlit as st
-import whisper
+
+# from collections import defaultdict
+# import pandas as pd
+# import whisper
 
 class YoutubeAudioExtractor:
     """Youtube 링크를 리스트 형식으로 받으면 해당 링크에서 음원 추출
+
+        NOTE: 진행중인 추출 프로세스를 중단하기위한 수단 필요
     """
 
     def __init__(self, urls, user_name):
@@ -24,16 +26,18 @@ class YoutubeAudioExtractor:
         if not os.path.exists(self.user_dir): # 지정한 디렉토리가 없을 경우 신규 생성
             os.popen(f"mkdir -p {self.user_dir}")
 
-        self.get_mp3_from_youtube()
+        self._get_mp3_from_youtube()
 
         # 저장된 음원 목록 txt파일로 저장
         # os.popen(f"ls -tr {self.user_dir} | grep -E '.mp3' > {os.path.join(self.user_dir, 'audio_list.txt')}").read()
         
-    def get_mp3_from_youtube(self):
+    def _get_mp3_from_youtube(self):
         """입력된 유튜브 url에서 mp4 확장자를 가지는 음원을 추출하여 지정한 디렉토리에 저장합니다.
         pytube docs: https://pytube.io/en/latest/_modules/pytube/streams.html#Stream.download
         """
-        my_bar = st.progress(0)
+        # my_bar = st.progress(0)
+
+        """ NOTE: 다운받고자 하는 영상의 정보를 먼저 조회하는 기능과 다운로드 기능의 분리 """
         for i, url in enumerate(tqdm(self.url_list)):
             youtube = YouTube(url)
             condition = youtube.streams.filter(only_audio=True, file_extension='mp4', type='audio', abr='128kbps').order_by('abr').last()
@@ -50,9 +54,12 @@ class YoutubeAudioExtractor:
                     rm -f {save_file_path}
                     """).read()
             
-            my_bar.progress((i+1) * 100//len(self.url_list)) # 프로그래스 바
+            # my_bar.progress((i+1) * 100//len(self.url_list)) # 프로그래스 바
     
 class AudioEditor:
+    """
+        NOTE: 추출한 오디오를 어디에 저장할 것인지 정해야 함 (S3, Local, In-Memory)
+    """
 
     def __init__(self, user_dir):
         self.user_dir = user_dir
@@ -212,7 +219,7 @@ def get_audio_length(file_path):
         int: 
     """
     
-    # SoudFile이 우분투에서 정상적으로 작동하지 않아 대체함
+    # SoundFile이 우분투에서 정상적으로 작동하지 않아 대체함
     # samplerate = sf.SoundFile(file_path).samplerate # extract samplerate
     # frames = sf.SoundFile(file_path).frames # extract audio frames
     # length = int(round(frames / samplerate)) # switch audio frames to second length
@@ -254,27 +261,27 @@ def translator(msg, source="en", target="ko"):
     # return english text
     return response.json()["message"]["result"]["translatedText"]
 
-def speech_to_text(file_path, translate=False, translate_language=None):
-    """extract text from audio
+# def speech_to_text(file_path, translate=False, translate_language=None):
+#     """extract text from audio
 
-    Args:
-        file_path (str): audio file path
+#     Args:
+#         file_path (str): audio file path
 
-    Returns:
-        pandas.DataFrame: text script
-    """
+#     Returns:
+#         pandas.DataFrame: text script
+#     """
 
-    model = whisper.load_model("base")
-    result = model.transcribe(file_path, verbose=False)
-    script_info = defaultdict(list)
+#     model = whisper.load_model("base")
+#     result = model.transcribe(file_path, verbose=False)
+#     script_info = defaultdict(list)
 
-    for segment in result['segments']:
-        script_info['start'].append(segment['start'])
-        script_info['end'].append(segment['end'])
-        script_info['text'].append(segment['text'])
-        if translate:
-            script_info['translate'].append(translator(segment['text'], source=translate_language[0], target=translate_language[1]))
+#     for segment in result['segments']:
+#         script_info['start'].append(segment['start'])
+#         script_info['end'].append(segment['end'])
+#         script_info['text'].append(segment['text'])
+#         if translate:
+#             script_info['translate'].append(translator(segment['text'], source=translate_language[0], target=translate_language[1]))
 
-    script_info_df = pd.DataFrame(script_info).round(2)
+#     script_info_df = pd.DataFrame(script_info).round(2)
 
-    return script_info_df
+#     return script_info_df
