@@ -29,12 +29,20 @@ class YoutubeAudioExtractor:
 
         # 올바른 링크가 입력되지 않을 경우 빈 리스트가 생성될 수 있음
         self.urls_list = re.findall('http[a-zA-Z0-9:/.?=_\-]+', urls_str)
-        if len(self.urls_list) == 0: raise BadRequest('올바른 링크 형식이 아닙니다.')
 
     def extract_url_information(self):
+        """입력받은 Youtube urls의 영상 정보를 출력
+
+        Returns:
+            list: 각 url에 대한 정보가 dictionary 형태로 포함
+        """
+
         results = []
         for url in self.urls_list:
-            youtube = YouTube(url) # url 인식 못할 경우 내부 raise 실행 (이유 제시)
+            
+            # NOTE: 사용할 수 없는 url의 경우 내부 raise 실행 (이유 제시)
+            # NOTE: 사용 불가한 url이 포착된 경우 Main-Server에 오류 메시지 전달 구현할 것
+            youtube = YouTube(url)
 
             results.append({
                 'title': youtube.title,
