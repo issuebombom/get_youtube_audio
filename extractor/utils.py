@@ -15,20 +15,20 @@ from datetime import timedelta, datetime
 # import whisper
 
 class YoutubeAudioExtractor:
-    """Youtube 링크를 리스트 형식으로 받으면 해당 링크에서 음원 추출
+    """Youtube 링크를 스트링 형식으로 받으면 해당 링크에서 음원 추출
 
         NOTE: 진행중인 추출 프로세스를 중단하기위한 수단 필요
     """
 
-    def __init__(self, urls_str):
+    def __init__(self, urls):
         """유튜브 url 정보를 추출
 
         Args:
-            urls (list): get youtube urls
+            urls (string): get youtube urls
         """
 
         # 올바른 링크가 입력되지 않을 경우 빈 리스트가 생성될 수 있음
-        self.urls_list = re.findall('http[a-zA-Z0-9:/.?=_\-]+', urls_str)
+        self.urls_list = re.findall('http[a-zA-Z0-9:/.?=_\-]+', urls)
 
     def extract_url_information(self):
         """입력받은 Youtube urls의 영상 정보를 출력

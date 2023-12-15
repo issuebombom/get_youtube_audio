@@ -1,4 +1,8 @@
-import { Body, Controller, Get } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+} from '@nestjs/common';
 import { GetLinksInformationDto } from './dto/get-links-information.dto';
 import { LinksService } from './links.service';
 import { HttpService } from '@nestjs/axios';
@@ -11,11 +15,11 @@ export class LinksController {
     private httpService: HttpService,
   ) {}
 
-  @Get('/get-url-info')
+  @Post('/get-url-info')
   getLinksInformation(@Body() getLinksInformationDto: GetLinksInformationDto) {
     const res = this.httpService
       .post('http://127.0.0.1:5000/urls', getLinksInformationDto)
-      .pipe(map((res) => res.data))
+      .pipe(map((res) => res.data.error ?? res.data))
       .pipe(
         catchError((error) => {
           throw new Error(error);

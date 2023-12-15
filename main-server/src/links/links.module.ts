@@ -8,6 +8,7 @@ import { HttpModule } from '@nestjs/axios';
     HttpModule.register({
       timeout: 30000,
       maxRedirects: 5,
+      
     }),
   ],
   controllers: [LinksController],
