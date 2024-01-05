@@ -1,22 +1,39 @@
-from flask import Flask, request
-from werkzeug.exceptions import BadRequest
+""" 
+reference 
+  https://github.com/ftisiot/flask-apache-kafka-demo/blob/main/code/app.py
+
+"""
+
 from utils import YoutubeAudioExtractor
- 
-app = Flask(__name__)
+from kafka import KafkaConsumer
+import json
 
-@app.route('/urls', methods=['POST'])
-def get_url_information():
-    req = request.get_json()
+TOPIC_NAME = "TEST-KAFKA"
+GROUP_ID = "youtube-extractor"
+CLIENT_ID = "get-links-info"
+KAFKA_SERVER = "localhost:9092"
+ 
+consumer = KafkaConsumer(
+    bootstrap_servers=KAFKA_SERVER,
+    group_id=GROUP_ID,
+    client_id=CLIENT_ID,
+    value_deserializer=lambda v: json.loads(v.decode('utf-8'))
+)
+
+consumer.subscribe(TOPIC_NAME)
+
+try:
+    for message in consumer:
+        message = message.value
+        links = message['links']
         
-    try:        
-        urls = req['urls'] # string
-        youtube = YoutubeAudioExtractor(urls)
-        urls_information = youtube.extract_url_information()
+        youtube = YoutubeAudioExtractor(links)
+        video_information = youtube.extract_url_information()
+        print(video_information)
 
-        return urls_information # jsonify없이 잘 전달됨
-    
-    except Exception as e:
-        return { 'error': f'{e}' }
- 
-if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5000, debug=True)
+except Exception as e:
+    print({ 'error': f'{e}' })
+
+finally:
+    if consumer:
+        consumer.close()
