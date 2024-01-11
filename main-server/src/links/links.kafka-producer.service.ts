@@ -16,5 +16,5 @@ export class LinksKafkaProducerService {
 
 interface ILinksKafkaProducerServiceSendMessage {
   topic: string;
-  message: SendLinksMessageDto;
+  message: Record<string, any>;
 }
