@@ -14,7 +14,7 @@ import { LinksKafkaProducerService } from './links.kafka-producer.service';
         options: {
           client: {
             clientId: 'test-client-1',
-            brokers: ['localhost:9092'],
+            brokers: ['host.docker.internal:9092'],
           },
           consumer: {
             groupId: 'test-group-1',
@@ -30,6 +30,7 @@ import { LinksKafkaProducerService } from './links.kafka-producer.service';
   controllers: [LinksController],
   providers: [
     // LinksService,
-    LinksKafkaProducerService],
+    LinksKafkaProducerService,
+  ],
 })
 export class LinksModule {}

@@ -9,7 +9,7 @@ async function bootstrap() {
     transport: Transport.KAFKA,
     options: {
       client: {
-        brokers: ['172.30.1.38:9092'], // host.docker.internal:9092가 작동하지 않음
+        brokers: ['host.docker.internal:9092'],
       },
     },
   });
