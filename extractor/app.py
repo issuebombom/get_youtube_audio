@@ -5,7 +5,7 @@ import json
 TOPIC_NAME = "TEST-KAFKA"
 GROUP_ID = "youtube-extractor"
 CLIENT_ID = "get-links-info"
-KAFKA_SERVER = "host.docker.internal:9092"
+KAFKA_SERVER = "kafka:9092"
  
 consumer = KafkaConsumer(
     bootstrap_servers=KAFKA_SERVER,

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { LinksController } from './links.controller';
-import { LinksService } from './links.service';
+// import { LinksService } from './links.service';
 import { HttpModule } from '@nestjs/axios';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { LinksKafkaProducerService } from './links.kafka-producer.service';
@@ -14,7 +14,7 @@ import { LinksKafkaProducerService } from './links.kafka-producer.service';
         options: {
           client: {
             clientId: 'test-client-1',
-            brokers: ['host.docker.internal:9092'],
+            brokers: ['kafka:9092'],
           },
           consumer: {
             groupId: 'test-group-1',

@@ -7,11 +7,6 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.connectMicroservice({
     transport: Transport.KAFKA,
-    options: {
-      client: {
-        brokers: ['host.docker.internal:9092'],
-      },
-    },
   });
 
   app.useGlobalPipes(
