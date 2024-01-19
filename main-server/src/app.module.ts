@@ -4,7 +4,9 @@ import { AppService } from './app.service';
 import { LinksModule } from './links/links.module';
 
 @Module({
-  imports: [LinksModule],
+  imports: [
+    LinksModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -5,8 +5,7 @@ import json
 import re
 from tqdm import tqdm
 from pytube import YouTube
-from werkzeug.exceptions import BadRequest
-from datetime import timedelta, datetime
+from datetime import timedelta
 
 
 
@@ -20,7 +19,7 @@ class YoutubeAudioExtractor:
         NOTE: 진행중인 추출 프로세스를 중단하기위한 수단 필요
     """
 
-    def __init__(self, urls):
+    def __init__(self, links):
         """유튜브 url 정보를 추출
 
         Args:
@@ -28,7 +27,7 @@ class YoutubeAudioExtractor:
         """
 
         # 올바른 링크가 입력되지 않을 경우 빈 리스트가 생성될 수 있음
-        self.urls_list = re.findall('http[a-zA-Z0-9:/.?=_\-]+', urls)
+        self.links_list = re.findall('http[a-zA-Z0-9:/.?=_\-]+', links)
 
     def extract_url_information(self):
         """입력받은 Youtube urls의 영상 정보를 출력
@@ -38,18 +37,18 @@ class YoutubeAudioExtractor:
         """
 
         results = []
-        for url in self.urls_list:
+        for link in self.links_list:
             
             # NOTE: 사용할 수 없는 url의 경우 내부 raise 실행 (이유 제시)
             # NOTE: 사용 불가한 url이 포착된 경우 Main-Server에 오류 메시지 전달 구현할 것
-            youtube = YouTube(url)
+            youtube = YouTube(link)
 
             results.append({
                 'title': youtube.title,
                 'thumbnail_url': youtube.thumbnail_url,
                 'channel_id': youtube.channel_id,
                 'length': str(timedelta(seconds=youtube.length)),
-                'url': url
+                'url': link
             })
 
         return results

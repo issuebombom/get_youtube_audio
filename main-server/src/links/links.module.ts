@@ -1,17 +1,21 @@
 import { Module } from '@nestjs/common';
 import { LinksController } from './links.controller';
-import { LinksService } from './links.service';
-import { HttpModule } from '@nestjs/axios';
+import { LinksKafkaService } from './links.kafka.service';
+import { kafkaConsumer, kafkaProducer } from './links.kafka.config';
 
 @Module({
-  imports: [
-    HttpModule.register({
-      timeout: 30000,
-      maxRedirects: 5,
-      
-    }),
-  ],
+  imports: [],
   controllers: [LinksController],
-  providers: [LinksService],
+  providers: [
+    {
+      provide: 'KafkaProducer',
+      useValue: kafkaProducer,
+    },
+    {
+      provide: 'KafkaConsumer',
+      useValue: kafkaConsumer,
+    },
+    LinksKafkaService,
+  ],
 })
 export class LinksModule {}

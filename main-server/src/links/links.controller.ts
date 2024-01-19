@@ -1,30 +1,28 @@
-import {
-  Body,
-  Controller,
-  Post,
-} from '@nestjs/common';
-import { GetLinksInformationDto } from './dto/get-links-information.dto';
-import { LinksService } from './links.service';
-import { HttpService } from '@nestjs/axios';
-import { catchError, map } from 'rxjs';
+import { Body, Controller, Post } from '@nestjs/common';
+import { LinksKafkaService } from './links.kafka.service';
+import { SendLinksMessageDto } from './dto/send-links-message.dto';
 
 @Controller('links')
 export class LinksController {
-  constructor(
-    private linksService: LinksService,
-    private httpService: HttpService,
-  ) {}
+  constructor(private readonly linksKafkaService: LinksKafkaService) {}
 
-  @Post('/get-url-info')
-  getLinksInformation(@Body() getLinksInformationDto: GetLinksInformationDto) {
-    const res = this.httpService
-      .post('http://127.0.0.1:5000/urls', getLinksInformationDto)
-      .pipe(map((res) => res.data.error ?? res.data))
-      .pipe(
-        catchError((error) => {
-          throw new Error(error);
-        }),
-      );
-    return res;
+  @Post('/send-message')
+  async sendMessage(@Body() sendLinksMessageDto: SendLinksMessageDto) {
+    this.linksKafkaService.sendMessage({
+      topic: 'TEST-KAFKA',
+      message: sendLinksMessageDto,
+    });
+
+    return sendLinksMessageDto;
   }
 }
+
+// @MessagePattern('get-links-msg')
+// getLinksInformation(
+//   @Payload() message: string,
+//   @Ctx() context: KafkaContext,
+// ) {
+//   const OriginalMessage = context.getMessage();
+//   const res = OriginalMessage.value;
+//   console.log(message, res);
+// }

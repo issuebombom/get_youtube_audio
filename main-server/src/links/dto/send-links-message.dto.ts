@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class GetLinksInformationDto {
+export class SendLinksMessageDto {
   @IsString()
   @IsNotEmpty()
-  urls: string;
+  links: string;
 }
