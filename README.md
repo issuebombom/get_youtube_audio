@@ -22,7 +22,7 @@
 
 > Result:
 >
-> - axios와 kafka 두 가지 방법 모두 구현
+> - axios와 kafka 두 가지 방법 모두 구현 `branch 참조`
 > - kafka 방식은 docker-compose up으로 실행 (producer: nestjs, consumer: python)
 > - 현재 유튜브 링크 전달 시 해당 영상 정보만 출력하는 기능 구현
 
