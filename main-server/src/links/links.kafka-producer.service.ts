@@ -5,12 +5,14 @@ import { SendLinksMessageDto } from './dto/send-links-message.dto';
 @Injectable()
 export class LinksKafkaProducerService {
   constructor(
-    @Inject('YOUTUBE_SERVICE') private readonly clientKafka: ClientKafka,
+    @Inject('YOUTUBE_SERVICE') private readonly kafkaProducer: ClientKafka,
   ) {}
 
   sendMessage({ topic, message }: ILinksKafkaProducerServiceSendMessage): void {
-    const jsonString = JSON.stringify(message)
-    this.clientKafka.emit<SendLinksMessageDto>(topic, jsonString);
+    this.kafkaProducer.emit<SendLinksMessageDto>(
+      topic,
+      JSON.stringify(message),
+    );
   }
 }
 

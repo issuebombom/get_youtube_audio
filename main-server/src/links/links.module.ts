@@ -14,7 +14,7 @@ import { LinksKafkaProducerService } from './links.kafka-producer.service';
         options: {
           client: {
             clientId: 'test-client-1',
-            brokers: ['kafka:9092'],
+            brokers: ['kafka:19092'],
           },
           consumer: {
             groupId: 'test-group-1',
