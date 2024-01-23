@@ -75,7 +75,7 @@ depends_on:
 > `파이썬 컨슈머는 브로커가 READY 상태가 될 때까지 연결 재시도를 하지 않고 연결 오류 발생 후 서버 다운됨`
 >
 > - docker-compose up으로 카프카와 컨슈머를 실행하는데 컨슈머가 카프카의 준비완료를 기다리지 않음
-> - docker-compose의 depends_on: kafka를 컨슈머 서버에 적용했으나, 이는 카프카 컨테이너의 실행까지만 기다려 줄 뿐 ready상태에 돌입할 때 까지 기다려주지는 않으므로 해결되지 않음
+> - ~~docker-compose의 depends_on: kafka를 컨슈머 서버에 적용했으나, 이는 카프카 컨테이너의 실행까지만 기다려 줄 뿐 ready상태에 돌입할 때 까지 기다려주지는 않으므로 해결되지 않음~~(해결)
 > - kafka-python 패키지를 사용하여 KafkaConsumer 객체를 생성할 때 연결을 지속적으로 재시도하는 옵션을 찾아봄
 > - 도큐먼트를 참조하여 `retry_backoff_ms` 옵션이 원하는 기능으로 판단되어 30초로 설정해 보았으나 해결되지 않음
 > - while문으로 직접 만들기로 하여 아래와 같이 코드를 작성하여 문제를 해결함
@@ -97,6 +97,31 @@ while True:
         continue
 kafkaConsumer.receive_message()
 ```
+
+> 추가 문제 해결
+>
+> docker-compose 실행 시 healthcheck와 depends_on의 condition 기능을 활용한다. healthcheck는 주기적으로 해당 컨테이너의 상태를 점검하기 위한 도구이다. kafka 컨테이너의 healthcheck결과가 `success`이면 컨슈머 컨테이너를 실행한다. 이 때 depends_on에 조건을 `service_healthy`로 설정한다. 아래와 같이 설정하면 카프카 컨테이너 실행 후 20초 뒤에 테스트가 시작되며 이를 성공하면 컨슈머 컨테이너가 실행된다. 주의할 점은 healthcheck의 start_period가 interval과 함께 설정될 경우 두 값이 더해진 시간만큼 기다린 뒤 첫 테스트를 실행한다는 점이다.
+
+```yaml
+kafka-1:
+  # 다른 항목 생략
+  healthcheck:
+    test: nc -z kafka-1 19092 || exit 1 # 해당 포트가 열려있는지 체크 || 1은 unhealty를 뜻한다
+    interval: 20s # 20초 간격으로 정기 점검한다.
+    timeout: 5s # 테스트 코드 실행 결과를 5초간 기다린다.
+    retries: 3 # 테스트 실패 시 총 3번 재검사 한다.
+    # start_period: 30s # 컨테이너 실행 후 n초 뒤에 첫 테스트를 실행한다.
+
+extractor-server:
+  # 다른 항목 생략
+  depends_on:
+    kafka-1:
+      condition: service_healthy
+```
+
+(참조)  
+https://docs.docker.com/compose/compose-file/05-services/#depends_on  
+https://docs.docker.com/engine/reference/run/#healthcheck
 
 ### 도커 컨테이너 생성의 효율성
 
@@ -168,4 +193,5 @@ CMD python app.py
 [kafka-python 패키지](https://kafka-python.readthedocs.io/en/master/index.html)  
 [confluent-kafka-python 패키지](https://github.com/confluentinc/confluent-kafka-python)  
 [카프카 docker-compose.yaml 작성1](https://github.com/wurstmeister/kafka-docker)  
-[카프카 docker-compose.yaml 작성2](https://devocean.sk.com/blog/techBoardDetail.do?ID=164016)
+[카프카 docker-compose.yaml 작성2](https://devocean.sk.com/blog/techBoardDetail.do?ID=164016)  
+[Docker Compose & 버전별 특징](https://meetup.nhncloud.com/posts/277)
