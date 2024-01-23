@@ -20,7 +20,7 @@ class Consumer:
             group_id=group_id,
             auto_offset_reset="latest",  # earliest, latest
             # retry_backoff_ms=30000, # 연결 시도
-            # reconnect_backoff_max_ms=30000, 재연결 시도
+            reconnect_backoff_max_ms=30000, # 재연결 시도
             # enable_auto_commit=True, # 오프셋 자동 커밋 여부
             # consumer_timeout_ms=1000 # 데이터 이터레이션을 막는 시간
         )

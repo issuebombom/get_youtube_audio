@@ -1,14 +1,14 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { LinksKafkaService } from './links.kafka.service';
 import { SendLinksMessageDto } from './dto/send-links-message.dto';
+import { LinksKafkaProducerService } from './links.kafka-producer.service';
 
 @Controller('links')
 export class LinksController {
-  constructor(private readonly linksKafkaService: LinksKafkaService) {}
+  constructor(private readonly linksKafkaProducerService: LinksKafkaProducerService) {}
 
   @Post('/send-message')
   async sendMessage(@Body() sendLinksMessageDto: SendLinksMessageDto) {
-    this.linksKafkaService.sendMessage({
+    this.linksKafkaProducerService.sendMessage({
       topic: 'TEST-KAFKA',
       message: sendLinksMessageDto,
     });
