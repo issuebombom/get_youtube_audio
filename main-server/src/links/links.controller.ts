@@ -9,7 +9,7 @@ export class LinksController {
   @Post('/send-message')
   async sendMessage(@Body() sendLinksMessageDto: SendLinksMessageDto) {
     this.linksKafkaProducerService.sendMessage({
-      topic: 'TEST-KAFKA',
+      topic: 'LINKS-YOUTUBE',
       message: sendLinksMessageDto,
     });
 

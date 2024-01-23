@@ -4,10 +4,10 @@ import json
 import logging
 import time
 
-KAFKA_SERVER = ["kafka:19092"]
-TOPIC_NAME = "TEST-KAFKA"
-GROUP_ID = "youtube-extractor"
-CLIENT_ID = "get-links-info"
+KAFKA_SERVER = ["kafka-1:19092"]
+TOPIC_NAME = "LINKS-YOUTUBE"
+GROUP_ID = "get-links-1"
+CLIENT_ID = "extractor-links-1"
 
 
 class Consumer:

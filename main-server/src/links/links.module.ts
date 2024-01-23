@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { LinksController } from './links.controller';
-import { HttpModule } from '@nestjs/axios';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { LinksKafkaProducerService } from './links.kafka-producer.service';
 
@@ -8,23 +7,16 @@ import { LinksKafkaProducerService } from './links.kafka-producer.service';
   imports: [
     ClientsModule.register([
       {
-        name: 'YOUTUBE_SERVICE',
+        name: 'LINK_SERVICE',
         transport: Transport.KAFKA,
         options: {
           client: {
-            clientId: 'test-client-1',
-            brokers: ['kafka:19092'],
-          },
-          consumer: {
-            groupId: 'test-group-1',
+            clientId: 'main-links-1',
+            brokers: ['kafka-1:19092'],
           },
         },
       },
     ]),
-    HttpModule.register({
-      timeout: 30000,
-      maxRedirects: 5,
-    }),
   ],
   controllers: [LinksController],
   providers: [LinksKafkaProducerService],
