@@ -1,4 +1,5 @@
 from utils import YoutubeAudioExtractor
+from flask import Flask, request, abort
 from kafka import KafkaConsumer
 import json
 import logging
@@ -20,7 +21,7 @@ class Consumer:
             group_id=group_id,
             auto_offset_reset="latest",  # earliest, latest
             # retry_backoff_ms=30000, # 연결 시도
-            reconnect_backoff_max_ms=30000, # 재연결 시도
+            reconnect_backoff_max_ms=30000,  # 재연결 시도
             # enable_auto_commit=True, # 오프셋 자동 커밋 여부
             # consumer_timeout_ms=1000 # 데이터 이터레이션을 막는 시간
         )
@@ -37,19 +38,39 @@ class Consumer:
             print(f"Extract Process Error: {e}")
 
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("consumer.conn")
+app = Flask(__name__)
 
-"""카프카 연결 반복 시도
-- 카프카 ready 상태에 돌입할 때 까지 연결 재시도
-"""
-while True:
+
+@app.route("/links", methods=["POST"])
+def get_links_information():
+    req = request.get_json()
+
     try:
-        kafkaConsumer = Consumer(KAFKA_SERVER, TOPIC_NAME, CLIENT_ID, GROUP_ID)
-        break
-    except Exception as e:
-        logger.error(f"exception occurred: {e}")
-        logger.info("retrying on errors")
-        time.sleep(1)
-        continue
-kafkaConsumer.receive_message()
+        links = req["links"]  # string[]
+        youtube = YoutubeAudioExtractor(links)
+        link_information = youtube.extract_url_information()
+
+        return link_information  # jsonify없이 잘 전달됨
+
+    except Exception as err:
+        abort(400, description=err)
+
+
+if __name__ == "__main__":
+    app.run(host="127.0.0.1", port=5000, debug=True)
+    # logging.basicConfig(level=logging.INFO)
+    # logger = logging.getLogger("consumer.conn")
+
+    # """카프카 연결 반복 시도
+    # - 카프카 ready 상태에 돌입할 때 까지 연결 재시도
+    # """
+    # while True:
+    #     try:
+    #         kafkaConsumer = Consumer(KAFKA_SERVER, TOPIC_NAME, CLIENT_ID, GROUP_ID)
+    #         break
+    #     except Exception as e:
+    #         logger.error(f"exception occurred: {e}")
+    #         logger.info("retrying on errors")
+    #         time.sleep(1)
+    #         continue
+    # kafkaConsumer.receive_message()
