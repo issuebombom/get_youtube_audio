@@ -2,6 +2,10 @@ import { Module } from '@nestjs/common';
 import { LinksController } from './links.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { LinksKafkaProducerService } from './links.kafka-producer.service';
+import { MongooseModule } from '@nestjs/mongoose';
+import { Link, LinkSchema } from './schemas/links.schema';
+import { HttpModule } from '@nestjs/axios';
+import { LinksService } from './links.service';
 
 @Module({
   imports: [
@@ -17,8 +21,19 @@ import { LinksKafkaProducerService } from './links.kafka-producer.service';
         },
       },
     ]),
+    MongooseModule.forFeature([
+      {
+        name: Link.name,
+        schema: LinkSchema,
+        collection: 'youtube-info',
+      },
+    ]),
+    HttpModule.register({
+      timeout: 30000,
+      maxRedirects: 5,
+    }),
   ],
   controllers: [LinksController],
-  providers: [LinksKafkaProducerService],
+  providers: [LinksKafkaProducerService, LinksService],
 })
 export class LinksModule {}
