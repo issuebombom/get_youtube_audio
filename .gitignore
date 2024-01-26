@@ -168,7 +168,7 @@ cython_debug/
 poetry.toml
 
 etc.
-test.py
+test.*
 .gitmessage.txt
 .DS_Store
 run.sh
