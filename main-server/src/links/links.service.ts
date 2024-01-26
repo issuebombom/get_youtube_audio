@@ -4,7 +4,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { lastValueFrom } from 'rxjs';
 import { Link } from './schemas/links.schema';
 import { Model } from 'mongoose';
-import { subscribe } from 'diagnostics_channel';
 
 @Injectable()
 export class LinksService {
@@ -21,11 +20,10 @@ export class LinksService {
           sendLinksMessageDto,
         ),
       );
-      const data = res.data;
-      const result = await this.linkModel.insertMany(data);
+      const result = await this.linkModel.insertMany(res.data);
       return result;
     } catch (err) {
-      return err.response.data;
+      return err.response.data ?? err;
     }
   }
 }
