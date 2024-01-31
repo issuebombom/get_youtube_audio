@@ -2,6 +2,8 @@ from utils import YoutubeAudioExtractor
 from flask import Flask, request, abort
 from kafka import KafkaConsumer
 import json
+import os
+from pymongo import MongoClient
 import logging
 import time
 
@@ -38,6 +40,28 @@ class Consumer:
             print(f"Extract Process Error: {e}")
 
 
+# config (docker-compose environmnet)
+class Config:
+    def __init__(self):
+        self.MONGO_ID = os.environ.get("MONGO_ID")
+        self.MONGO_PW = os.environ.get("MONGO_PW")
+        self.MONGO_CLUSTER = os.environ.get("MONGO_CLUSTER")
+
+
+config = Config()  # 환경변수 등록
+
+# mongoDB Atlas connection
+client = MongoClient(
+    f"mongodb+srv://{config.MONGO_ID}:{config.MONGO_PW}@{config.MONGO_CLUSTER}.udxtbwr.mongodb.net/?retryWrites=true&w=majority",
+)
+try:
+    client.admin.command("ping")
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print(e)
+
+db = client["test"]  # database
+
 app = Flask(__name__)
 
 
@@ -50,14 +74,19 @@ def get_links_information():
         youtube = YoutubeAudioExtractor(links)
         link_information = youtube.extract_url_information()
 
-        return link_information  # jsonify없이 잘 전달됨
+        # Insert MongoDB Atlas
+        db["youtube"].insert_many(link_information)  # 내부적으로 입력 변수를 bson으롤 바꾼다.
+        # print(link_information)
+        # return link_information  # jsonify없이 잘 전달됨
+        return {"res": "ok"}
 
     except Exception as err:
-        abort(400, description=err)
+        print(err)
+        abort(500, description=err)
 
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    app.run(host="extractor-server", port=5000, debug=True)
     # logging.basicConfig(level=logging.INFO)
     # logger = logging.getLogger("consumer.conn")
 

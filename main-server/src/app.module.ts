@@ -7,7 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ envFilePath: '../.env.development', isGlobal: true }),
+    // ConfigModule.forRoot({ envFilePath: '../.env.development', isGlobal: true }),
     MongooseModule.forRoot(
       `mongodb+srv://${process.env.MONGO_ID}:${process.env.MONGO_PW}@${process.env.MONGO_CLUSTER}.udxtbwr.mongodb.net/?retryWrites=true&w=majority`,
     ),

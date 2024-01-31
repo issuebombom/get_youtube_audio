@@ -43,7 +43,11 @@ services:
     ports:
       - 3000:3000
     # env_file:
-    #   - './.env'
+    #   - ./.env
+    environment:
+      MONGO_ID: ${MONGO_ID}
+      MONGO_PW: ${MONGO_PW}
+      MONGO_CLUSTER: ${MONGO_CLUSTER}
   
 
   extractor-server:
@@ -52,6 +56,12 @@ services:
       dockerfile: Dockerfile
     ports:
       - 5000:5000
+    # env_file:
+    #   - ./.env
+    environment:
+      MONGO_ID: ${MONGO_ID}
+      MONGO_PW: ${MONGO_PW}
+      MONGO_CLUSTER: ${MONGO_CLUSTER}
     depends_on:
       kafka-1:
         condition: service_healthy

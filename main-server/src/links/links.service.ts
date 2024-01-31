@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { HttpException, Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { lastValueFrom } from 'rxjs';
 import { Link } from './schemas/links.schema';
@@ -16,14 +16,14 @@ export class LinksService {
     try {
       const res = await lastValueFrom(
         this.httpService.post(
-          'http://127.0.0.1:5000/links',
+          'http://extractor-server:5000/links',
           sendLinksMessageDto,
         ),
       );
-      const result = await this.linkModel.insertMany(res.data);
-      return result;
+      const data = res.data;
+      return data;
     } catch (err) {
-      return err.response.data ?? err;
+      throw new InternalServerErrorException(err.response?.data ?? err);
     }
   }
 }
