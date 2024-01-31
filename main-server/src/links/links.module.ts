@@ -25,7 +25,7 @@ import { LinksService } from './links.service';
       {
         name: Link.name,
         schema: LinkSchema,
-        collection: 'youtube-info',
+        collection: 'youtube',
       },
     ]),
     HttpModule.register({

@@ -10,7 +10,7 @@ export class LinksController {
     private readonly linksService: LinksService,
   ) {}
 
-  @Post('/send-message')
+  @Post('/send-message-kafka')
   async sendMessage(@Body() sendLinksMessageDto: SendLinksMessageDto) {
     this.linksKafkaProducerService.sendMessage({
       topic: 'LINKS-YOUTUBE',
@@ -21,11 +21,13 @@ export class LinksController {
   }
 
   @Post('/send-message-axios')
-  async createLinksInformation(@Body() sendLinksMessageDto: SendLinksMessageDto) {
-    const res = await this.linksService.createLinksInformation({
+  async createLinksInformation(
+    @Body() sendLinksMessageDto: SendLinksMessageDto,
+  ) {
+    const result = await this.linksService.createLinksInformation({
       sendLinksMessageDto,
     });
-    return res
+    return result;
   }
 }
 
