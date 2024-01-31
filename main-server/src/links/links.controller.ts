@@ -11,13 +11,13 @@ export class LinksController {
   ) {}
 
   @Post('/send-message-kafka')
-  async sendMessage(@Body() sendLinksMessageDto: SendLinksMessageDto) {
+  sendMessage(@Body() sendLinksMessageDto: SendLinksMessageDto) {
     this.linksKafkaProducerService.sendMessage({
       topic: 'LINKS-YOUTUBE',
       message: sendLinksMessageDto,
     });
 
-    return sendLinksMessageDto;
+    return { res: 'ok' };
   }
 
   @Post('/send-message-axios')

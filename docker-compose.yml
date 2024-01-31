@@ -42,8 +42,6 @@ services:
       - ./main-server/src:/app/src
     ports:
       - 3000:3000
-    # env_file:
-    #   - ./.env
     environment:
       MONGO_ID: ${MONGO_ID}
       MONGO_PW: ${MONGO_PW}
@@ -56,8 +54,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - 5000:5000
-    # env_file:
-    #   - ./.env
     environment:
       MONGO_ID: ${MONGO_ID}
       MONGO_PW: ${MONGO_PW}
